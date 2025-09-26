@@ -1,0 +1,41 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String?
+  password  String
+  boards    Board[]
+}
+
+model Board {
+  id        Int      @id @default(autoincrement())
+  title     String
+  ownerId   Int
+  owner     User     @relation(fields: [ownerId], references: [id])
+  lists     List[]
+}
+
+model List {
+  id        Int      @id @default(autoincrement())
+  title     String
+  boardId   Int
+  board     Board    @relation(fields: [boardId], references: [id])
+  cards     Card[]
+}
+
+model Card {
+  id        Int      @id @default(autoincrement())
+  title     String
+  description String?
+  listId    Int
+  list      List     @relation(fields: [listId], references: [id])
+}
