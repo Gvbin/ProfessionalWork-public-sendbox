@@ -16,7 +16,12 @@ app.get('/', (req, res) => {
 const authRoutes = require('./routes/auth');
 app.use('/auth', authRoutes);
 
+const boardsRoutes = require('./routes/boards');
+app.use('/boards', boardsRoutes);
+
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+module.exports = { app, server };

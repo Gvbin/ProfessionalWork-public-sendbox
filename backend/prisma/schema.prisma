@@ -20,7 +20,7 @@ model Board {
   id        Int      @id @default(autoincrement())
   title     String
   ownerId   Int
-  owner     User     @relation(fields: [ownerId], references: [id])
+  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   lists     List[]
 }
 
@@ -28,14 +28,14 @@ model List {
   id        Int      @id @default(autoincrement())
   title     String
   boardId   Int
-  board     Board    @relation(fields: [boardId], references: [id])
+  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
   cards     Card[]
 }
 
 model Card {
-  id        Int      @id @default(autoincrement())
-  title     String
+  id          Int      @id @default(autoincrement())
+  title       String
   description String?
-  listId    Int
-  list      List     @relation(fields: [listId], references: [id])
+  listId      Int
+  list        List     @relation(fields: [listId], references: [id], onDelete: Cascade)
 }

@@ -7,6 +7,7 @@ import Signup from './pages/Signup.jsx'
 import Login from './pages/Login.jsx'
 import Home from './pages/Home.jsx'
 import Boards from './pages/Boards.jsx'
+import BoardDetail from './pages/BoardDetail.jsx' // Import the new page
 import Help from './pages/Help.jsx'
 
 createRoot(document.getElementById('root')).render(
@@ -18,6 +19,7 @@ createRoot(document.getElementById('root')).render(
         <Route path="/login" element={<Login />} />
         <Route path="/app" element={<App />} />
         <Route path="/boards" element={<Boards />} />
+        <Route path="/boards/:boardId" element={<BoardDetail />} /> {/* Add this route */}
         <Route path="/help" element={<Help />} />
       </Routes>
     </BrowserRouter>
