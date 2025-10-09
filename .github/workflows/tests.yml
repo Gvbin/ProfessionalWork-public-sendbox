@@ -9,6 +9,23 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    # Démarre un service PostgreSQL pour les tests backend
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: mydatabase
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U user -d mydatabase"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     strategy:
       matrix:
         part: [backend, frontend]
@@ -30,6 +47,17 @@ jobs:
         working-directory: ${{ matrix.part }}
         run: npm run lint --if-present
 
+      - name: Generate Prisma Client (backend only)
+        if: matrix.part == 'backend'
+        working-directory: backend
+        env:
+          DATABASE_URL: "postgresql://user:password@localhost:5432/mydatabase?schema=public"
+        run: npx prisma generate
+
       - name: Run tests
+        # Exécute les tests seulement si le script "test" existe
+        # Définit DATABASE_URL pour les tests backend
         working-directory: ${{ matrix.part }}
-        run: npm test
+        env:
+          DATABASE_URL: "postgresql://user:password@localhost:5432/mydatabase?schema=public"
+        run: npm test --if-present
