@@ -54,6 +54,13 @@ jobs:
           DATABASE_URL: "postgresql://user:password@localhost:5432/mydatabase?schema=public"
         run: npx prisma generate
 
+      - name: Apply Prisma schema (backend only)
+        if: matrix.part == 'backend'
+        working-directory: backend
+        env:
+          DATABASE_URL: "postgresql://user:password@localhost:5432/mydatabase?schema=public"
+        run: npx prisma db push
+
       - name: Run tests
         # Exécute les tests seulement si le script "test" existe
         # Définit DATABASE_URL pour les tests backend
