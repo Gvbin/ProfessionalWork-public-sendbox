@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import { ArrowLeft } from 'lucide-react';
 
 export default function BoardDetail() {
   const { boardId } = useParams();
@@ -15,7 +16,6 @@ export default function BoardDetail() {
       return;
     }
 
-    // Fetch board details
     fetch(`http://localhost:4000/boards/${boardId}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -32,7 +32,14 @@ export default function BoardDetail() {
   return (
     <div className="min-h-screen flex flex-col bg-blue-50">
       <Navbar />
-      <header className="px-6 py-4 bg-white/50 shadow-sm">
+      <header className="px-6 py-4 bg-white/50 shadow-sm flex items-center gap-4">
+        <Link
+          to="/boards"
+          className="p-2 rounded-full hover:bg-gray-200 transition"
+          title="Back to boards"
+        >
+          <ArrowLeft className="w-5 h-5 text-gray-700" />
+        </Link>
         <h1 className="text-2xl font-bold text-blue-800">{board ? board.title : 'Loading...'}</h1>
       </header>
       <main className="flex-1 p-4">

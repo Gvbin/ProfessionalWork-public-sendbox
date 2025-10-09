@@ -7,7 +7,6 @@ const router = express.Router();
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'changeme';
 
-// Signup
 router.post('/signup', async (req, res) => {
   const { email, password, name } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
@@ -24,7 +23,6 @@ router.post('/signup', async (req, res) => {
   res.json({ token, user: { id: user.id, email: user.email, name: user.name } });
 });
 
-// Login
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
@@ -39,17 +37,39 @@ router.post('/login', async (req, res) => {
   res.json({ token, user: { id: user.id, email: user.email, name: user.name } });
 });
 
-// Logout (client-side: just delete the token)
 router.post('/logout', (req, res) => {
   res.json({ message: 'Logged out' });
 });
 
-// Example of a protected route
 const authenticateToken = require('../middlewares/auth');
 router.get('/me', authenticateToken, async (req, res) => {
   const user = await prisma.user.findUnique({ where: { id: req.user.userId } });
   if (!user) return res.status(404).json({ error: 'User not found' });
   res.json({ id: user.id, email: user.email, name: user.name });
+});
+
+router.put('/me', authenticateToken, async (req, res) => {
+  const { name } = req.body;
+  try {
+    const updatedUser = await prisma.user.update({
+      where: { id: req.user.userId },
+      data: { name },
+    });
+    res.json({ id: updatedUser.id, email: updatedUser.email, name: updatedUser.name });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update profile.' });
+  }
+});
+
+router.delete('/me', authenticateToken, async (req, res) => {
+  try {
+    await prisma.user.delete({
+      where: { id: req.user.userId },
+    });
+    res.json({ success: true, message: 'Account deleted successfully.' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete account.' });
+  }
 });
 
 module.exports = router;

@@ -11,7 +11,10 @@ export default function Boards() {
   const [isCreateModalOpen, setCreateModalOpen] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [boardToEdit, setBoardToEdit] = useState(null);
-  const [newTitle, setNewTitle] = useState("");
+  const [boardToDelete, setBoardToDelete] = useState(null); // State for delete confirmation
+  
+  const [createTitle, setCreateTitle] = useState("");
+  const [editTitle, setEditTitle] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -37,12 +40,12 @@ export default function Boards() {
     const res = await fetch("http://localhost:4000/boards", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ title: newTitle }),
+      body: JSON.stringify({ title: createTitle }),
     });
     if (res.ok) {
       const newBoard = await res.json();
       setBoards([...boards, newBoard]);
-      setNewTitle("");
+      setCreateTitle("");
       setCreateModalOpen(false);
     } else {
       setError("Error creating board.");
@@ -55,12 +58,12 @@ export default function Boards() {
     const res = await fetch(`http://localhost:4000/boards/${boardToEdit.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ title: newTitle }),
+      body: JSON.stringify({ title: editTitle }),
     });
     if (res.ok) {
       const updatedBoard = await res.json();
       setBoards(boards.map((b) => (b.id === boardToEdit.id ? updatedBoard : b)));
-      setNewTitle("");
+      setEditTitle("");
       setEditModalOpen(false);
     } else {
       setError("Error updating board.");
@@ -75,6 +78,7 @@ export default function Boards() {
     });
     if (res.ok) {
       setBoards(boards.filter((b) => b.id !== id));
+      setBoardToDelete(null);
     } else {
       setError("Error deleting board.");
     }
@@ -85,16 +89,14 @@ export default function Boards() {
     e.preventDefault();
     e.stopPropagation();
     setBoardToEdit(board);
-    setNewTitle(board.title);
+    setEditTitle(board.title);
     setEditModalOpen(true);
   };
 
-  const openDeleteConfirm = (id, e) => {
+  const openDeleteConfirm = (board, e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (window.confirm("Are you sure you want to delete this board?")) {
-      handleDelete(id);
-    }
+    setBoardToDelete(board);
   };
 
 
@@ -117,7 +119,7 @@ export default function Boards() {
                   <Pencil size={16} />
                 </button>
                 <button
-                  onClick={(e) => openDeleteConfirm(board.id, e)}
+                  onClick={(e) => openDeleteConfirm(board, e)}
                   className="text-white hover:text-gray-200"
                 >
                   <Trash2 size={16} />
@@ -137,7 +139,7 @@ export default function Boards() {
 
       {/* Create Board Modal */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50">
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
             <h2 className="text-lg font-semibold mb-4">New Board</h2>
             <form onSubmit={handleCreate}>
@@ -145,15 +147,17 @@ export default function Boards() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">Board Title</label>
                 <input
                   type="text"
-                  value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
-                  className="border rounded px-3 py-2 w-full"
+                  value={createTitle}
+                  onChange={(e) => setCreateTitle(e.target.value)}
+                  className="border rounded px-3 py-2 w-full focus:ring-2 focus:ring-blue-500 outline-none"
                   required
+                  autoFocus
                 />
               </div>
               {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
               <div className="flex justify-end gap-2">
                 <button
+                  type="button"
                   onClick={() => setCreateModalOpen(false)}
                   className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition"
                 >
@@ -173,7 +177,7 @@ export default function Boards() {
 
       {/* Edit Board Modal */}
       {isEditModalOpen && boardToEdit && (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50">
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
             <h2 className="text-lg font-semibold mb-4">Edit Board</h2>
             <form onSubmit={handleUpdate}>
@@ -181,15 +185,17 @@ export default function Boards() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">Board Title</label>
                 <input
                   type="text"
-                  value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
-                  className="border rounded px-3 py-2 w-full"
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  className="border rounded px-3 py-2 w-full focus:ring-2 focus:ring-blue-500 outline-none"
                   required
+                  autoFocus
                 />
               </div>
               {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
               <div className="flex justify-end gap-2">
                 <button
+                  type="button"
                   onClick={() => setEditModalOpen(false)}
                   className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition"
                 >
@@ -203,6 +209,34 @@ export default function Boards() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {boardToDelete && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full">
+            <h2 className="text-lg font-semibold mb-2">Delete Board</h2>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete the board "<strong>{boardToDelete.title}</strong>"? This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setBoardToDelete(null)}
+                className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDelete(boardToDelete.id)}
+                className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition"
+              >
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       )}
