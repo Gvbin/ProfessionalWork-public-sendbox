@@ -64,11 +64,6 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-6 sm:px-10 flex items-center justify-between h-16">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 group">
-          <img
-            src="/vite.svg"
-            alt="Epitrello Logo"
-            className="h-9 group-hover:scale-110 transition-transform duration-300"
-          />
           <span className="text-2xl font-extrabold text-white tracking-tight group-hover:text-gray-100 transition">
             Epitrello
           </span>
