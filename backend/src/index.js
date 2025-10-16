@@ -19,6 +19,15 @@ app.use('/auth', authRoutes);
 const boardsRoutes = require('./routes/boards');
 app.use('/boards', boardsRoutes);
 
+const listsRoutes = require('./routes/lists');
+app.use('/lists', listsRoutes);
+
+const cardsRoutes = require('./routes/cards');
+app.use('/cards', cardsRoutes);
+
+const usersRoutes = require('./routes/users');
+app.use('/users', usersRoutes);
+
 const PORT = process.env.PORT || 4000;
 const server = app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

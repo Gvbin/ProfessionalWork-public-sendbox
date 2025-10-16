@@ -9,33 +9,51 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  name      String?
-  password  String
-  boards    Board[]
+  id            Int            @id @default(autoincrement())
+  email         String         @unique
+  name          String?
+  password      String
+  ownedBoards   Board[]        @relation("OwnedBoards")
+  boardMembers  BoardMember[]
+  assignedCards Card[]         @relation("AssignedCards")
+  createdAt     DateTime       @default(now())
 }
 
 model Board {
-  id        Int      @id @default(autoincrement())
+  id        Int           @id @default(autoincrement())
   title     String
   ownerId   Int
-  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  owner     User          @relation("OwnedBoards", fields: [ownerId], references: [id], onDelete: Cascade)
   lists     List[]
+  members   BoardMember[]
+}
+
+model BoardMember {
+  id      Int   @id @default(autoincrement())
+  boardId Int
+  userId  Int
+  board   Board @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  user    User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([boardId, userId])
 }
 
 model List {
   id        Int      @id @default(autoincrement())
   title     String
+  position  Int
   boardId   Int
   board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
   cards     Card[]
 }
 
 model Card {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String?
-  listId      Int
-  list        List     @relation(fields: [listId], references: [id], onDelete: Cascade)
+  id           Int      @id @default(autoincrement())
+  title        String
+  description  String?
+  position     Int
+  listId       Int
+  list         List     @relation(fields: [listId], references: [id], onDelete: Cascade)
+  assignedToId Int?
+  assignedTo   User?    @relation("AssignedCards", fields: [assignedToId], references: [id], onDelete: SetNull)
 }
