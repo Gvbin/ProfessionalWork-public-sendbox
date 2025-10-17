@@ -28,6 +28,12 @@ app.use('/cards', cardsRoutes);
 const usersRoutes = require('./routes/users');
 app.use('/users', usersRoutes);
 
+const labelsRoutes = require('./routes/labels');
+app.use('/labels', labelsRoutes);
+
+const commentsRoutes = require('./routes/comments');
+app.use('/comments', commentsRoutes);
+
 const PORT = process.env.PORT || 4000;
 const server = app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

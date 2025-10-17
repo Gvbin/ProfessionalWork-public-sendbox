@@ -24,10 +24,14 @@ router.post('/', authenticateToken, async (req, res) => {
     },
     include: {
       assignedTo: {
-        select: {
-          id: true,
-          name: true,
-          email: true
+        select: { id: true, name: true, email: true }
+      },
+      labels: true,
+      comments: {
+        include: {
+          user: {
+            select: { id: true, name: true, email: true }
+          }
         }
       }
     }
@@ -49,10 +53,14 @@ router.put('/:id', authenticateToken, async (req, res) => {
       data: updateData,
       include: {
         assignedTo: {
-          select: {
-            id: true,
-            name: true,
-            email: true
+          select: { id: true, name: true, email: true }
+        },
+        labels: true,
+        comments: {
+          include: {
+            user: {
+              select: { id: true, name: true, email: true }
+            }
           }
         }
       }

@@ -16,6 +16,7 @@ model User {
   ownedBoards   Board[]        @relation("OwnedBoards")
   boardMembers  BoardMember[]
   assignedCards Card[]         @relation("AssignedCards")
+  comments      Comment[]
   createdAt     DateTime       @default(now())
 }
 
@@ -48,12 +49,32 @@ model List {
 }
 
 model Card {
-  id           Int      @id @default(autoincrement())
+  id           Int       @id @default(autoincrement())
   title        String
   description  String?
   position     Int
   listId       Int
-  list         List     @relation(fields: [listId], references: [id], onDelete: Cascade)
+  list         List      @relation(fields: [listId], references: [id], onDelete: Cascade)
   assignedToId Int?
-  assignedTo   User?    @relation("AssignedCards", fields: [assignedToId], references: [id], onDelete: SetNull)
+  assignedTo   User?     @relation("AssignedCards", fields: [assignedToId], references: [id], onDelete: SetNull)
+  labels       Label[]
+  comments     Comment[]
+}
+
+model Label {
+  id     Int    @id @default(autoincrement())
+  name   String
+  color  String
+  cardId Int
+  card   Card   @relation(fields: [cardId], references: [id], onDelete: Cascade)
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  cardId    Int
+  card      Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
 }

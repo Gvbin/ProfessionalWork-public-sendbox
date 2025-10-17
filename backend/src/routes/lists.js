@@ -26,10 +26,14 @@ router.get('/', authenticateToken, async (req, res) => {
         orderBy: { position: 'asc' },
         include: {
           assignedTo: {
-            select: {
-              id: true,
-              name: true,
-              email: true
+            select: { id: true, name: true, email: true }
+          },
+          labels: true,
+          comments: {
+            include: {
+              user: {
+                select: { id: true, name: true, email: true }
+              }
             }
           }
         }
